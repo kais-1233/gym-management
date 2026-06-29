@@ -1,6 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from dotenv import load_dotenv
+import requests
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
 import os 
+import csv
+from flask import Response
 from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
 import psycopg2
@@ -44,7 +49,25 @@ def get_days_left(expiry_date):
 
 # --- AUTHENTICATION ROUTES ---
 
-# --- AUTHENTICATION ROUTES ---
+def send_whatsapp_message(mobile, msg_type, name, gym_name, plan=None, expiry_date=None):
+    if msg_type == "welcome":
+        message = f"Hello {name}! 💪 Welcome to {gym_name}. Aapka {plan}-month ka plan activate ho gaya hai."
+    elif msg_type == "expiring":
+        message = f"Hi {name}, reminder! ⏳ Aapka gym subscription {expiry_date} ko expire hone wala hai. Kripya time par renew kar lein."
+    elif msg_type == "expired":
+        message = f"Hi {name}, aapka gym plan aaj expire ho chuka hai 🔴. Renew karein!"
+    
+    # 1. Terminal print (kabhi chalta hai, kabhi nahi)
+    print(f"\n🚀 [MESSAGE] -> {mobile}", flush=True)
+
+    # 2. FOOLPROOF METHOD: Seedha ek text file me save kar do!
+    try:
+        log_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'whatsapp_logs.txt')
+        with open(log_file, "a", encoding="utf-8") as f:
+            time_now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            f.write(f"[{time_now}] TO: {mobile} | MSG: {message}\n")
+    except Exception as e:
+        print("Log error:", e)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -211,11 +234,15 @@ def add_member():
         expiry_dt = join_dt + relativedelta(months=plan)
         expiry_date = expiry_dt.strftime("%Y-%m-%d")
 
-        photo = request.files["photo"]
-        filename = photo.filename
-        photo_path = os.path.join(UPLOAD_FOLDER, filename) if filename else ""
-        if filename:
-            photo.save(photo_path)
+        # --- YAHAN CHANGE KIYA HAI: PHOTO OPTIONAL LOGIC ---
+        photo_path = "" # Default blank path agar user photo nahi dalta
+        if 'photo' in request.files:
+            photo = request.files["photo"]
+            if photo and photo.filename != "": # Agar file select ki gayi hai tabhi save ho
+                filename = photo.filename
+                photo_path = os.path.join(UPLOAD_FOLDER, filename)
+                photo.save(photo_path)
+        # --------------------------------------------------
 
         conn = get_db()
         cursor = conn.cursor()
@@ -226,6 +253,8 @@ def add_member():
 
         conn.commit()
         conn.close()
+        # --- YEH NAYI LINE ADD KARNI HAI ---
+        send_whatsapp_message(mobile, "welcome", name=name, gym_name=session['gym_name'], plan=plan)
         return redirect("/members")
 
     return render_template("add_member.html")
@@ -237,16 +266,24 @@ def members():
     search = request.args.get("search", "")
     page_title = "Total Members"
 
-    if status == "active":
-        page_title = "Active Members"
-    elif status == "expiring":
-        page_title = "Expiring Soon"
-    elif status == "expired":
-        page_title = "Expired Members"
-
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM members WHERE user_id=%s AND member_status='active'", (session['user_id'],))
+
+    # FIX LOGIC: Agar search query aayi hai, toh 'active' aur 'left' dono status ke members fetch karenge
+    if search:
+        page_title = "Search Results"
+        cursor.execute("SELECT * FROM members WHERE user_id=%s", (session['user_id'],))
+    else:
+        # Purana logic: Agar koi status tab click kiya hai bina search ke
+        if status == "active":
+            page_title = "Active Members"
+        elif status == "expiring":
+            page_title = "Expiring Soon"
+        elif status == "expired":
+            page_title = "Expired Members"
+            
+        cursor.execute("SELECT * FROM members WHERE user_id=%s AND member_status='active'", (session['user_id'],))
+        
     members = cursor.fetchall()
     
     member_list = []
@@ -255,12 +292,15 @@ def members():
         member_dict = dict(member)
         member_dict["days_left"] = days_left  
          
+        # Text-based Search Filter (Name aur Mobile dono ke liye)
         if search and search.lower() not in member["name"].lower() and search not in member["mobile"]:
             continue
 
-        if status == "active" and days_left <= 2: continue
-        elif status == "expiring" and not (1 <= days_left <= 2): continue
-        elif status == "expired" and days_left > 0: continue
+        # Status Filter Only (Jab search use NA ho raha ho)
+        if not search:
+            if status == "active" and days_left <= 2: continue
+            elif status == "expiring" and not (1 <= days_left <= 2): continue
+            elif status == "expired" and days_left > 0: continue
 
         member_list.append(member_dict)
 
@@ -347,16 +387,36 @@ def recent_joins():
 
     return render_template("members.html", members=member_list, page_title="Recent Joined Members")
 
-@app.route("/revenue")
-@login_required
-def revenue():
-    return "<h1>Revenue This Month</h1><h3>Feature Coming Soon</h3><a href='/'>Back Dashboard</a>"
+ 
 
+ 
+
+# Export Data Route (Working CSV Export - Without Status)
 @app.route("/export")
 @login_required
 def export_excel():
-    return "<h1>Export Excel</h1><h3>Feature Coming Soon</h3><a href='/'>Back Dashboard</a>"
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    # Query se 'member_status' ko hata diya gaya hai
+    cursor.execute("SELECT id, name, mobile, plan, join_date, expiry_date FROM members WHERE user_id=%s", (session['user_id'],))
+    members = cursor.fetchall()
+    conn.close()
 
+    def generate():
+        # Excel/CSV Header se 'Status' hata diya hai
+        yield "ID,Name,Mobile,Plan (Months),Join Date,Expiry Date\n"
+        
+        # User Data Rows se bhi status wala column hata diya hai
+        for m in members:
+            yield f"{m['id']},{m['name']},{m['mobile']},{m['plan']},{m['join_date']},{m['expiry_date']}\n"
+
+    # Return CSV file for download
+    return Response(
+        generate(), 
+        mimetype='text/csv', 
+        headers={"Content-Disposition": "attachment; filename=members_export.csv"}
+    )
 @app.route("/delete/<int:id>")
 @login_required
 def delete_member(id):

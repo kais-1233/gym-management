@@ -23,54 +23,38 @@
             flex-direction: row;
         }
 
-        /* --- Sidebar (Matches Dashboard) --- */
+        /* --- Sidebar (Default: Laptops & Desktops) --- */
         .sidebar {
             width: 220px;
             height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
-            background: #111827;
+            background: #111827; 
             color: white;
-            padding: 20px 15px;
+            padding: 15px; /* Top/Bottom padding thodi kam ki hai */
             z-index: 1000;
             transition: all 0.3s ease;
+            overflow-y: auto; /* YEH LINE add ki hai taaki scroll aa sake */
         }
 
-        .logo-section {
-            margin-bottom: 25px;
-            text-align: center;
-        }
+        /* Sidebar ka scrollbar hide karne ke liye (Optional par acha dikhta hai) */
+        .sidebar::-webkit-scrollbar { display: none; }
+        .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .logo-section img {
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .logo-section h6 {
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #ffffff;
-            font-size: 13px;
-        }
+        /* ... baaki apka logo-section wala code waisa hi rahega ... */
 
         .sidebar a {
             display: flex;
             align-items: center;
-            padding: 10px 12px;
-            margin-bottom: 6px;
+            padding: 8px 12px; /* Padding kam kardi */
+            margin-bottom: 4px; /* Margin kam kardi */
             color: #9ca3af;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13.5px; /* Font size thoda sa adjust kiya */
             transition: all 0.3s ease;
-        }
-
-        .sidebar a i { margin-right: 10px; font-size: 1rem; }
-        .sidebar a:hover, .sidebar a.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
         }
 
         /* --- Main Content --- */
@@ -85,9 +69,9 @@
         /* --- Topbar --- */
         .topbar {
             background: white;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 25px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 0px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             border: 1px solid #e2e8f0;
             position: sticky; /* Sticks to top on desktop */
@@ -110,7 +94,7 @@
             background: white;
             padding: 15px 20px;
             border-radius: 16px;
-            margin-bottom: 25px;
+            margin-bottom: 0px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             border: 1px solid #e2e8f0;
         }
@@ -223,6 +207,10 @@
             <img src="/static/logo.jpeg" width="50" alt="Gym Logo" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
             <h6 class="mt-2" style="text-transform: uppercase;">{{ session.gym_name }}</h6>
             <hr style="border-color: #374151; width: 100%;">
+            <!-- Add this right after the Export Data link -->
+            <hr style="border-color: #374151; width: 100%; margin: 15px 0;">
+            
+           
         </div>
 
         <div class="sidebar-nav w-100">
@@ -231,8 +219,12 @@
             <a href="/members" class="active"><i class="bi bi-people-fill"></i> Members List</a>
             <a href="/left-gym"><i class="bi bi-door-open-fill"></i> Left Gym</a>
             <a href="/recent-joins"><i class="bi bi-person-check-fill"></i> Recent Joins</a>
-            <a href="/revenue"><i class="bi bi-cash-stack"></i> Revenue</a>
+             
             <a href="/export"><i class="bi bi-file-earmark-excel-fill"></i> Export Data</a>
+            
+            <a href="/logout" class="text-danger" style="font-weight: 600; margin-top: 5px;">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
         </div>
     </div>
 
@@ -250,23 +242,7 @@
                 </a>
             </div>
         </div>
-        <div class="search-container">
-            <form action="/members" method="GET" class="m-0">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-9 col-sm-10">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Search across all members (Active, Left, Expired)..." style="box-shadow: none;">
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-2">
-                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 8px; font-weight: 500;">
-                            Search
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
+        >
         <div class="table-card">
         <div class="table-card">
             <div class="table-responsive">

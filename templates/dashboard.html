@@ -10,165 +10,265 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7fe; 
-            color: #2b3674;
-            margin: 0;
-        }
+    :root {
+        --bg-main: #f8fafc;
+        --sidebar-bg: rgba(17, 24, 39, 0.95); /* Ultra dark with slight glass effect */
+        --accent-color: #6366f1; /* Indigo trend color */
+        --text-main: #1e293b;
+        --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 5px 15px -7px rgba(0, 0, 0, 0.05);
+        --glass-blur: blur(12px);
+        
+        /* Icon Colors */
+        --blue-primary: #4f46e5;
+        --green-success: #16a34a;
+        --orange-warning: #ea580c;
+        --red-danger: #dc2626;
+    }
 
-        /* --- Responsive Wrapper Layout --- */
-        .dashboard-wrapper {
-            display: flex;
-            flex-direction: row;
-        }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        color: var(--text-main);
+        margin: 0;
+        min-height: 100vh;
+    }
 
-        /* --- Sidebar (Default: Laptops & Desktops) --- */
+    /* --- Responsive Wrapper Layout --- */
+    .dashboard-wrapper {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+    }
+
+    /* --- Ultra Creative Floating Sidebar (Desktop) --- */
+    .sidebar {
+        width: 240px;
+        height: calc(100vh - 40px);
+        position: fixed;
+        left: 20px;
+        top: 20px;
+        background: var(--sidebar-bg);
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        color: white;
+        padding: 25px 20px;
+        z-index: 1000;
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .logo-section {
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .logo-section img {
+        border-radius: 16px;
+        padding: 5px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .logo-section h6 {
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 1.5px;
+        background: linear-gradient(to right, #ffffff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Sidebar Links UI */
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        color: #94a3b8;
+        text-decoration: none;
+        border-radius: 14px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar a i { 
+        margin-right: 12px; 
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar a:hover {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateX(4px);
+    }
+
+    .sidebar a.active {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        color: #ffffff;
+        font-weight: 600;
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .sidebar a:hover i {
+        transform: scale(1.1);
+    }
+
+    /* Main Content (Desktop Layout) */
+    .main-content {
+        margin-left: 280px;
+        padding: 40px 30px;
+        width: calc(100% - 280px);
+        transition: all 0.4s ease;
+    }
+
+    /* --- Premium UI Cards & Glassmorphism Surfaces --- */
+    .topbar, .search-container, .table-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow: var(--card-shadow);
+        padding: 24px;
+    }
+
+    .topbar h4 { font-weight: 700; color: #1e293b; margin: 0; }
+    .topbar small { color: #64748b; font-weight: 500; }
+
+    /* Stat Cards Styling */
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: var(--card-shadow);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+        pointer-events: none;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-info h5 { font-size: 13px; color: #64748b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-info h1 { font-size: 32px; font-weight: 700; color: #1e293b; margin: 0; }
+
+    .icon-box {
+        width: 56px;
+        height: 56px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .icon-blue { background: #e0e7ff; color: var(--blue-primary); }
+    .icon-green { background: #dcfce7; color: var(--green-success); }
+    .icon-orange { background: #ffedd5; color: var(--orange-warning); }
+    .icon-red { background: #fee2e2; color: var(--red-danger); }
+
+    /* ==========================================
+       PAD & TABLET RESPONSIVE (iPads)
+       ========================================== */
+    @media (max-width: 1024px) {
         .sidebar {
-            width: 220px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background: #111827; 
-            color: white;
-            padding: 20px 15px;
-            z-index: 1000;
-            transition: all 0.3s ease;
+            width: 80px;
+            left: 10px;
+            top: 10px;
+            height: calc(100vh - 20px);
+            padding: 20px 10px;
         }
-
-        .logo-section {
-            margin-bottom: 25px;
-            text-align: center;
+        .logo-section h6, .sidebar a span, .sidebar hr {
+            display: none !important;
         }
-
-        .logo-section img {
+        .sidebar a {
+            justify-content: center;
+            padding: 15px 0;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
+        .sidebar a i { margin: 0; font-size: 1.4rem; }
+        .main-content {
+            margin-left: 110px;
+            width: calc(100% - 110px);
+            padding: 25px 20px;
+        }
+    }
 
-        .logo-section h6 {
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #ffffff;
+    /* ==========================================
+       MOBILE PHONE RESPONSIVE (100% Strict Block Fix)
+       ========================================== */
+    @media (max-width: 767px) {
+        .dashboard-wrapper {
+            display: block !important; /* Flexbox block me convert kiya */
+        }
+        .sidebar {
+            position: static !important; /* Fixed aur relative hata kar normal kiya */
+            width: calc(100% - 30px) !important;
+            height: auto !important;
+            margin: 15px auto !important;
+            border-radius: 20px;
+            padding: 15px;
+        }
+        .logo-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-section h6 { margin: 0 !important; }
+        .logo-section hr { display: none !important; }
+        
+        .sidebar-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .sidebar a {
+            margin-bottom: 0;
+            padding: 8px 14px;
             font-size: 13px;
         }
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 10px 12px;
-            margin-bottom: 6px;
-            color: #9ca3af;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar a i {
-            margin-right: 10px;
-            font-size: 1rem;
-        }
-
-        .sidebar a:hover, .sidebar a.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
-        }
-
-        /* --- Main Content (Default: Laptop) --- */
         .main-content {
-            margin-left: 220px;
-            padding: 30px;
-            width: 100%;
-            transition: all 0.3s ease;
+            margin-left: 0 !important;
+            width: 100% !important;
+            padding: 10px 15px 30px 15px !important; /* Proper breathing top padding */
         }
-
-        .topbar h4 { font-weight: 700; margin-bottom: 2px; }
-        .topbar small { color: #a3aed1; font-weight: 500; }
-
-        /* --- Stat Cards --- */
+        .topbar {
+            flex-direction: column;
+            align-items: stretch !important;
+            text-align: center;
+            gap: 15px;
+        }
         .stat-card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid #e2e8f0;
-            height: 100%;
+            padding: 20px 15px;
         }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            color: inherit;
+        .stat-info h1 {
+            font-size: 26px;
         }
-
-        .stat-info h5 { font-size: 13px; color: #a3aed1; font-weight: 600; margin-bottom: 5px; }
-        .stat-info h1 { font-size: 26px; font-weight: 700; color: #111827; margin: 0; }
-
-        .icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .icon-blue { background: #e0e7ff; color: #4f46e5; }
-        .icon-green { background: #dcfce7; color: #16a34a; }
-        .icon-orange { background: #ffedd5; color: #ea580c; }
-        .icon-red { background: #fee2e2; color: #dc2626; }
-
-        .search-container {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
-        }
-/* --- Sidebar (Default: Laptops & Desktops) --- */
-        .sidebar {
-            width: 220px;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            background: #111827; 
-            color: white;
-            padding: 15px; /* Top/Bottom padding thodi kam ki hai */
-            z-index: 1000;
-            transition: all 0.3s ease;
-            overflow-y: auto; /* YEH LINE add ki hai taaki scroll aa sake */
-        }
-
-        /* Sidebar ka scrollbar hide karne ke liye (Optional par acha dikhta hai) */
-        .sidebar::-webkit-scrollbar { display: none; }
-        .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* ... baaki apka logo-section wala code waisa hi rahega ... */
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px; /* Padding kam kardi */
-            margin-bottom: 4px; /* Margin kam kardi */
-            color: #9ca3af;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 13.5px; /* Font size thoda sa adjust kiya */
-            transition: all 0.3s ease;
-        }
+    }       
     </style>
 </head>
 <body>
@@ -178,23 +278,22 @@
         <div class="logo-section">
             <img src="/static/logo.jpeg" width="50" alt="Gym Logo" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
             <h6 class="mt-2" style="text-transform: uppercase;">{{ session.gym_name }}</h6>
-            <hr style="border-color: #374151; width: 100%;">
+            <hr style="border-color: rgba(255,255,255,0.1); width: 100%;">
         </div>
 
         <div class="sidebar-nav w-100">
-            <a href="/" class="active"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
-            <a href="/add"><i class="bi bi-person-plus-fill"></i> Add Member</a>
-            <a href="/members"><i class="bi bi-people-fill"></i> Members List</a>
-            <a href="/left-gym"><i class="bi bi-door-open-fill"></i> Left Gym</a>
-            <a href="/recent-joins"><i class="bi bi-person-check-fill"></i> Recent Joins</a>
-            <a href="/revenue"><i class="bi bi-cash-stack"></i> Revenue</a>
-            <a href="/export"><i class="bi bi-file-earmark-excel-fill"></i> Export Data</a>
+            <a href="/" class="active"><i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span></a>
+            <a href="/add"><i class="bi bi-person-plus-fill"></i> <span>Add Member</span></a>
+            <a href="/members"><i class="bi bi-people-fill"></i> <span>Members List</span></a>
+            <a href="/left-gym"><i class="bi bi-door-open-fill"></i> <span>Left Gym</span></a>
+            <a href="/recent-joins"><i class="bi bi-person-check-fill"></i> <span>Recent Joins</span></a>
             
-            <hr style="border-color: #374151; width: 100%; margin: 15px 0;">
+            <a href="/export"><i class="bi bi-file-earmark-excel-fill"></i> <span>Export Data</span></a>
             
-            <a href="/admin"><i class="bi bi-gear-fill"></i> Admin Panel</a>
+            <hr style="border-color: rgba(255,255,255,0.1); width: 100%; margin: 15px 0;">
+             
             <a href="/logout" class="text-danger" style="font-weight: 600; margin-top: 5px;">
-                <i class="bi bi-box-arrow-right"></i> Logout
+                <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
             </a>
         </div>
     </div>
@@ -206,22 +305,22 @@
                 <h4>Dashboard Overview</h4>
                 <small>Welcome back! Here's what's happening at the gym.</small>
             </div>
-            <a href="/add" class="btn btn-primary px-4 py-2" style="border-radius: 8px; font-weight: 500;">
+            <a href="/add" class="btn btn-primary px-4 py-2" style="border-radius: 12px; font-weight: 500; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
                 <i class="bi bi-plus-lg"></i> Add Member
             </a> 
         </div>
 
-        <div class="search-container">
+        <div class="search-container mb-4">
             <form action="/members" method="GET" class="m-0">
                 <div class="row g-3 align-items-center">
                     <div class="col-md-9 col-sm-10">
                         <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Search members by name or mobile number..." style="box-shadow: none;">
+                            <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Search members by name or mobile number..." style="box-shadow: none; border-radius: 0 12px 12px 0; padding: 12px;">
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-2">
-                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 8px; font-weight: 500;">
+                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 12px; font-weight: 500; padding: 12px; background: #4f46e5; border: none;">
                             Search
                         </button>
                     </div>
@@ -238,7 +337,7 @@
                             <h5>Total</h5>
                             <h1>{{ total }}</h1>
                         </div>
-                        <div class="icon-box icon-blue d-none d-sm-flex">
+                        <div class="icon-box icon-blue">
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
@@ -252,7 +351,7 @@
                             <h5>Active</h5>
                             <h1>{{ active }}</h1>
                         </div>
-                        <div class="icon-box icon-green d-none d-sm-flex">
+                        <div class="icon-box icon-green">
                             <i class="bi bi-activity"></i>
                         </div>
                     </div>
@@ -266,7 +365,7 @@
                             <h5>Expiring</h5>
                             <h1>{{ expiring }}</h1>
                         </div>
-                        <div class="icon-box icon-orange d-none d-sm-flex">
+                        <div class="icon-box icon-orange">
                             <i class="bi bi-clock-history"></i>
                         </div>
                     </div>
@@ -280,7 +379,7 @@
                             <h5>Expired</h5>
                             <h1>{{ expired }}</h1>
                         </div>
-                        <div class="icon-box icon-red d-none d-sm-flex">
+                        <div class="icon-box icon-red">
                             <i class="bi bi-exclamation-octagon-fill"></i>
                         </div>
                     </div>

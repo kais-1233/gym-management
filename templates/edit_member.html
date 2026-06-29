@@ -26,54 +26,38 @@
             flex-direction: row;
         }
 
-        /* --- Sidebar (Matches Dashboard) --- */
+        /* --- Sidebar (Default: Laptops & Desktops) --- */
         .sidebar {
             width: 220px;
             height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
-            background: #111827;
+            background: #111827; 
             color: white;
-            padding: 20px 15px;
+            padding: 15px; /* Top/Bottom padding thodi kam ki hai */
             z-index: 1000;
             transition: all 0.3s ease;
+            overflow-y: auto; /* YEH LINE add ki hai taaki scroll aa sake */
         }
 
-        .logo-section {
-            margin-bottom: 25px;
-            text-align: center;
-        }
+        /* Sidebar ka scrollbar hide karne ke liye (Optional par acha dikhta hai) */
+        .sidebar::-webkit-scrollbar { display: none; }
+        .sidebar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .logo-section img {
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        .logo-section h6 {
-            font-weight: 600;
-            letter-spacing: 1px;
-            color: #ffffff;
-            font-size: 13px;
-        }
+        /* ... baaki apka logo-section wala code waisa hi rahega ... */
 
         .sidebar a {
             display: flex;
             align-items: center;
-            padding: 10px 12px;
-            margin-bottom: 6px;
+            padding: 8px 12px; /* Padding kam kardi */
+            margin-bottom: 4px; /* Margin kam kardi */
             color: #9ca3af;
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13.5px; /* Font size thoda sa adjust kiya */
             transition: all 0.3s ease;
-        }
-
-        .sidebar a i { margin-right: 10px; font-size: 1rem; }
-        .sidebar a:hover, .sidebar a.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
         }
 
         /* --- Main Content --- */
@@ -198,8 +182,15 @@
             <a href="/members"><i class="bi bi-people-fill"></i> Members List</a>
             <a href="/left-gym"><i class="bi bi-door-open-fill"></i> Left Gym</a>
             <a href="/recent-joins"><i class="bi bi-person-check-fill"></i> Recent Joins</a>
-            <a href="/revenue"><i class="bi bi-cash-stack"></i> Revenue</a>
+             
             <a href="/export"><i class="bi bi-file-earmark-excel-fill"></i> Export Data</a>
+            <!-- Add this right after the Export Data link -->
+            <hr style="border-color: #374151; width: 100%; margin: 15px 0;">
+            
+             
+            <a href="/logout" class="text-danger" style="font-weight: 600; margin-top: 5px;">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
         </div>
     </div>
 
