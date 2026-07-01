@@ -12,11 +12,10 @@
     <style>
     :root {
         --bg-main: #f8fafc;
-        --sidebar-bg: rgba(17, 24, 39, 0.95); /* Ultra dark with slight glass effect */
-        --accent-color: #6366f1; /* Indigo trend color */
+        --sidebar-bg: #111827; /* Dark theme */
+        --accent-color: #6366f1;
         --text-main: #1e293b;
         --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 5px 15px -7px rgba(0, 0, 0, 0.05);
-        --glass-blur: blur(12px);
         
         /* Icon Colors */
         --blue-primary: #4f46e5;
@@ -31,156 +30,190 @@
         color: var(--text-main);
         margin: 0;
         min-height: 100vh;
+        overflow-x: hidden;
     }
 
-    /* --- Responsive Wrapper Layout --- */
-    .dashboard-wrapper {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
+    /* --- Top Mobile Header --- */
+    .mobile-header {
+        display: none;
+        background-color: var(--sidebar-bg);
+        color: white;
+        padding: 15px 20px;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1040;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    /* --- Ultra Creative Floating Sidebar (Desktop) --- */
+    .mobile-header .hamburger-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .mobile-header .header-logo {
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin: 0;
+    }
+
+    /* --- Sidebar Navigation --- */
     .sidebar {
-        width: 240px;
-        height: calc(100vh - 40px);
+        width: 260px;
+        height: 100vh;
         position: fixed;
-        left: 20px;
-        top: 20px;
+        left: 0;
+        top: 0;
         background: var(--sidebar-bg);
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
         color: white;
         padding: 25px 20px;
-        z-index: 1000;
-        border-radius: 24px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1050;
+        transition: left 0.3s ease-in-out;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
     }
 
     .sidebar::-webkit-scrollbar { display: none; }
 
+    .close-sidebar-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 24px;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        cursor: pointer;
+    }
+
     .logo-section {
-        margin-bottom: 25px;
+        margin-bottom: 30px;
         text-align: center;
+        margin-top: 10px;
     }
 
     .logo-section img {
-        border-radius: 16px;
-        padding: 5px;
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 3px;
+        margin-bottom: 10px;
     }
 
     .logo-section h6 {
         font-weight: 700;
-        font-size: 15px;
-        letter-spacing: 1.5px;
-        background: linear-gradient(to right, #ffffff, #94a3b8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-size: 14px;
+        letter-spacing: 1px;
+        color: #f8fafc;
+        margin: 0;
     }
 
     /* Sidebar Links UI */
+    .sidebar-nav {
+        flex-grow: 1;
+    }
+
     .sidebar a {
         display: flex;
         align-items: center;
         padding: 12px 16px;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         color: #94a3b8;
         text-decoration: none;
-        border-radius: 14px;
+        border-radius: 12px;
         font-weight: 500;
-        font-size: 14px;
+        font-size: 15px;
         transition: all 0.3s ease;
     }
 
     .sidebar a i { 
-        margin-right: 12px; 
-        font-size: 1.1rem;
-        transition: transform 0.3s ease;
+        margin-right: 15px; 
+        font-size: 1.2rem;
     }
 
     .sidebar a:hover {
         color: #ffffff;
         background: rgba(255, 255, 255, 0.05);
-        transform: translateX(4px);
     }
 
     .sidebar a.active {
         background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
         color: #ffffff;
         font-weight: 600;
-        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
     }
 
-    .sidebar a:hover i {
-        transform: scale(1.1);
+    .logout-btn {
+        margin-top: auto;
     }
 
-    /* Main Content (Desktop Layout) */
+    /* Sidebar Overlay for Mobile */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1045;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* Main Content */
     .main-content {
-        margin-left: 280px;
-        padding: 40px 30px;
-        width: calc(100% - 280px);
-        transition: all 0.4s ease;
+        margin-left: 260px;
+        padding: 30px;
+        transition: margin-left 0.3s ease;
     }
 
-    /* --- Premium UI Cards & Glassmorphism Surfaces --- */
-    .topbar, .search-container, .table-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 24px;
+    /* --- Premium UI Cards --- */
+    .topbar, .search-container {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
         border: 1px solid rgba(255, 255, 255, 0.7);
         box-shadow: var(--card-shadow);
-        padding: 24px;
+        padding: 20px;
     }
-
-    .topbar h4 { font-weight: 700; color: #1e293b; margin: 0; }
-    .topbar small { color: #64748b; font-weight: 500; }
 
     /* Stat Cards Styling */
     .stat-card {
         background: white;
-        border-radius: 24px;
-        padding: 24px;
+        border-radius: 16px;
+        padding: 20px;
         border: 1px solid rgba(255, 255, 255, 0.8);
         box-shadow: var(--card-shadow);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
-        pointer-events: none;
+        transition: transform 0.2s ease;
+        height: 100%;
     }
 
     .stat-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px);
     }
 
-    .stat-info h5 { font-size: 13px; color: #64748b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .stat-info h1 { font-size: 32px; font-weight: 700; color: #1e293b; margin: 0; }
+    .stat-info h5 { font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
+    .stat-info h1 { font-size: 28px; font-weight: 700; color: #1e293b; margin: 0; }
 
     .icon-box {
-        width: 56px;
-        height: 56px;
-        border-radius: 18px;
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
+        font-size: 22px;
     }
 
     .icon-blue { background: #e0e7ff; color: var(--blue-primary); }
@@ -189,207 +222,206 @@
     .icon-red { background: #fee2e2; color: var(--red-danger); }
 
     /* ==========================================
-       PAD & TABLET RESPONSIVE (iPads)
+       MOBILE RESPONSIVE TWEAKS
        ========================================== */
-    @media (max-width: 1024px) {
-        .sidebar {
-            width: 80px;
-            left: 10px;
-            top: 10px;
-            height: calc(100vh - 20px);
-            padding: 20px 10px;
+    @media (max-width: 768px) {
+        .mobile-header {
+            display: flex; 
         }
-        .logo-section h6, .sidebar a span, .sidebar hr {
-            display: none !important;
-        }
-        .sidebar a {
-            justify-content: center;
-            padding: 15px 0;
-            border-radius: 12px;
-        }
-        .sidebar a i { margin: 0; font-size: 1.4rem; }
-        .main-content {
-            margin-left: 110px;
-            width: calc(100% - 110px);
-            padding: 25px 20px;
-        }
-    }
-
-    /* ==========================================
-       MOBILE PHONE RESPONSIVE (100% Strict Block Fix)
-       ========================================== */
-    @media (max-width: 767px) {
-        .dashboard-wrapper {
-            display: block !important; /* Flexbox block me convert kiya */
-        }
-        .sidebar {
-            position: static !important; /* Fixed aur relative hata kar normal kiya */
-            width: calc(100% - 30px) !important;
-            height: auto !important;
-            margin: 15px auto !important;
-            border-radius: 20px;
-            padding: 15px;
-        }
-        .logo-section {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 15px;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-section h6 { margin: 0 !important; }
-        .logo-section hr { display: none !important; }
         
-        .sidebar-nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
+        .sidebar {
+            left: -300px; 
+            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
         }
-        .sidebar a {
-            margin-bottom: 0;
-            padding: 8px 14px;
-            font-size: 13px;
+        
+        .sidebar.open {
+            left: 0; 
         }
+
+        .close-sidebar-btn {
+            display: block; 
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
         .main-content {
-            margin-left: 0 !important;
-            width: 100% !important;
-            padding: 10px 15px 30px 15px !important; /* Proper breathing top padding */
+            margin-left: 0;
+            padding: 20px 15px;
         }
+        
         .topbar {
             flex-direction: column;
-            align-items: stretch !important;
             text-align: center;
             gap: 15px;
         }
-        .stat-card {
-            padding: 20px 15px;
+        
+        .topbar a {
+            width: 100%; /* Make add member button full width on mobile */
         }
+
+        .search-container {
+            padding: 15px;
+        }
+
+        .stat-card {
+            padding: 15px;
+        }
+        
         .stat-info h1 {
-            font-size: 26px;
+            font-size: 24px;
+        }
+        .icon-box {
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
         }
     }       
     </style>
 </head>
 <body>
 
-<div class="dashboard-wrapper">
-    <div class="sidebar">
-        <div class="logo-section">
-            <img src="/static/logo.jpeg" width="50" alt="Gym Logo" onerror="this.src='https://via.placeholder.com/50?text=Logo'">
-            <h6 class="mt-2" style="text-transform: uppercase;">{{ session.gym_name }}</h6>
-            <hr style="border-color: rgba(255,255,255,0.1); width: 100%;">
-        </div>
+<div class="mobile-header">
+    <button class="hamburger-btn" id="openSidebarBtn"><i class="bi bi-list"></i></button>
+    <h5 class="header-logo">{{ session.gym_name }}</h5>
+    <div class="profile-icon"><i class="bi bi-person-circle fs-3"></i></div>
+</div>
 
-        <div class="sidebar-nav w-100">
-            <a href="/" class="active"><i class="bi bi-grid-1x2-fill"></i> <span>Dashboard</span></a>
-            <a href="/add"><i class="bi bi-person-plus-fill"></i> <span>Add Member</span></a>
-            <a href="/members"><i class="bi bi-people-fill"></i> <span>Members List</span></a>
-            <a href="/left-gym"><i class="bi bi-door-open-fill"></i> <span>Left Gym</span></a>
-            <a href="/recent-joins"><i class="bi bi-person-check-fill"></i> <span>Recent Joins</span></a>
-            
-            <a href="/export"><i class="bi bi-file-earmark-excel-fill"></i> <span>Export Data</span></a>
-            
-            <hr style="border-color: rgba(255,255,255,0.1); width: 100%; margin: 15px 0;">
-             
-            <a href="/logout" class="text-danger" style="font-weight: 600; margin-top: 5px;">
-                <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
-            </a>
-        </div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="sidebar" id="sidebar">
+    <button class="close-sidebar-btn" id="closeSidebarBtn"><i class="bi bi-x-lg"></i></button>
+    
+    <div class="logo-section">
+        <img src="/static/logo.jpeg" width="60" alt="Gym Logo" onerror="this.src='https://via.placeholder.com/60?text=Logo'">
+        <h6 style="text-transform: uppercase;">{{ session.gym_name }}</h6>
     </div>
 
-    <div class="main-content">
+    <div class="sidebar-nav">
+        <a href="/" class="active"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a>
+        <a href="/add"><i class="bi bi-person-plus-fill"></i> Add Member</a>
+        <a href="/members"><i class="bi bi-people-fill"></i> Member List</a>
+        <a href="/left-gym"><i class="bi bi-door-closed-fill"></i> Left Member</a>
         
-        <div class="topbar d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4>Dashboard Overview</h4>
-                <small>Welcome back! Here's what's happening at the gym.</small>
-            </div>
-            <a href="/add" class="btn btn-primary px-4 py-2" style="border-radius: 12px; font-weight: 500; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
-                <i class="bi bi-plus-lg"></i> Add Member
-            </a> 
-        </div>
+        <a href="/export"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</a>
+    </div>
 
-        <div class="search-container mb-4">
-            <form action="/members" method="GET" class="m-0">
-                <div class="row g-3 align-items-center">
-                    <div class="col-md-9 col-sm-10">
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Search members by name or mobile number..." style="box-shadow: none; border-radius: 0 12px 12px 0; padding: 12px;">
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-2">
-                        <button type="submit" class="btn btn-primary w-100" style="border-radius: 12px; font-weight: 500; padding: 12px; background: #4f46e5; border: none;">
-                            Search
-                        </button>
+    <div class="logout-btn">
+        <hr style="border-color: rgba(255,255,255,0.1); margin-bottom: 15px;">
+        <a href="/logout" class="text-danger" style="font-weight: 600;">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+</div>
+
+<div class="main-content">
+    
+    <div class="topbar d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="m-0" style="font-weight: 700; color: #1e293b;">Dashboard Overview</h4>
+            <small class="text-muted">Welcome back! Here's what's happening at the gym.</small>
+        </div>
+        <a href="/add" class="btn btn-primary px-4 py-2" style="border-radius: 12px; font-weight: 500; background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); border: none; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
+            <i class="bi bi-plus-lg"></i> Add Member
+        </a> 
+    </div>
+
+    <div class="search-container mb-4">
+        <form action="/members" method="GET" class="m-0">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-10 col-9">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Search members by name or mobile..." style="box-shadow: none; border-radius: 0 12px 12px 0; padding: 10px;">
                     </div>
                 </div>
-            </form>
+                <div class="col-md-2 col-3">
+                    <button type="submit" class="btn btn-primary w-100" style="border-radius: 12px; font-weight: 500; padding: 10px; background: #4f46e5; border: none;">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <a href="/members" class="text-decoration-none d-block h-100">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h5>Total</h5>
+                        <h1>{{ total }}</h1>
+                    </div>
+                    <div class="icon-box icon-blue">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </a>
         </div>
 
-        <div class="row g-3 g-md-4">
-            
-            <div class="col-6 col-md-3">
-                <a href="/members" class="text-decoration-none d-block h-100">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h5>Total</h5>
-                            <h1>{{ total }}</h1>
-                        </div>
-                        <div class="icon-box icon-blue">
-                            <i class="bi bi-people-fill"></i>
-                        </div>
+        <div class="col-6 col-md-3">
+            <a href="/members?status=active" class="text-decoration-none d-block h-100">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h5>Active</h5>
+                        <h1>{{ active }}</h1>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="/members?status=active" class="text-decoration-none d-block h-100">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h5>Active</h5>
-                            <h1>{{ active }}</h1>
-                        </div>
-                        <div class="icon-box icon-green">
-                            <i class="bi bi-activity"></i>
-                        </div>
+                    <div class="icon-box icon-green">
+                        <i class="bi bi-activity"></i>
                     </div>
-                </a>
-            </div>
+                </div>
+            </a>
+        </div>
 
-            <div class="col-6 col-md-3">
-                <a href="/members?status=expiring" class="text-decoration-none d-block h-100">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h5>Expiring</h5>
-                            <h1>{{ expiring }}</h1>
-                        </div>
-                        <div class="icon-box icon-orange">
-                            <i class="bi bi-clock-history"></i>
-                        </div>
+        <div class="col-6 col-md-3">
+            <a href="/members?status=expiring" class="text-decoration-none d-block h-100">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h5>Expiring</h5>
+                        <h1>{{ expiring }}</h1>
                     </div>
-                </a>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <a href="/members?status=expired" class="text-decoration-none d-block h-100">
-                    <div class="stat-card">
-                        <div class="stat-info">
-                            <h5>Expired</h5>
-                            <h1>{{ expired }}</h1>
-                        </div>
-                        <div class="icon-box icon-red">
-                            <i class="bi bi-exclamation-octagon-fill"></i>
-                        </div>
+                    <div class="icon-box icon-orange">
+                        <i class="bi bi-clock-history"></i>
                     </div>
-                </a>
-            </div>
+                </div>
+            </a>
+        </div>
 
+        <div class="col-6 col-md-3">
+            <a href="/members?status=expired" class="text-decoration-none d-block h-100">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h5>Expired</h5>
+                        <h1>{{ expired }}</h1>
+                    </div>
+                    <div class="icon-box icon-red">
+                        <i class="bi bi-exclamation-octagon-fill"></i>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const openBtn = document.getElementById('openSidebarBtn');
+    const closeBtn = document.getElementById('closeSidebarBtn');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+    }
+
+    openBtn.addEventListener('click', toggleSidebar);
+    closeBtn.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar); // Close when clicking outside
+</script>
+
 </body>
 </html>
