@@ -59,6 +59,11 @@
         transition: left 0.3s ease-in-out;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .sidebar::-webkit-scrollbar { 
+        display: none; 
     }
 
     .close-sidebar-btn {
@@ -111,7 +116,19 @@
     </style>
 </head>
 <body>
+<div class="topbar d-flex justify-content-between align-items-center mb-4">
+        </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 <div class="mobile-header">
     <button class="hamburger-btn" id="openSidebarBtn"><i class="bi bi-list"></i></button>
     <h5 class="m-0" style="text-transform: uppercase;">{{ session.gym_name }}</h5>
@@ -131,6 +148,7 @@
         <a href="/add"><i class="bi bi-person-plus-fill"></i> Add Member</a>
         <a href="/members"><i class="bi bi-people-fill"></i> Member List</a>
         <a href="/left-gym"><i class="bi bi-door-closed-fill"></i> Left Member</a>
+        <a href="/recent-joins"><i class="bi bi-clock-history"></i> Recent Joins</a>
         <a href="/export"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</a>
     </div>
     <div>
@@ -158,7 +176,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Mobile Number</label>
-                    <input type="text" name="mobile" value="{{ member.mobile }}" class="form-control" required>
+                    <input type="text" name="mobile" value="{{ member.mobile }}" class="form-control" pattern="[0-9]{10}" maxlength="10" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                 </div>
             </div>
             <div class="row">
@@ -166,8 +184,16 @@
                     <label class="form-label fw-bold">Membership Plan</label>
                     <select name="plan" class="form-select" required>
                         <option value="1" {% if member.plan == 1 %}selected{% endif %}>1 Month</option>
+                        <option value="2" {% if member.plan == 2 %}selected{% endif %}>2 Months</option>
                         <option value="3" {% if member.plan == 3 %}selected{% endif %}>3 Months</option>
+                        <option value="4" {% if member.plan == 4 %}selected{% endif %}>4 Months</option>
+                        <option value="5" {% if member.plan == 5 %}selected{% endif %}>5 Months</option>
                         <option value="6" {% if member.plan == 6 %}selected{% endif %}>6 Months</option>
+                        <option value="7" {% if member.plan == 7 %}selected{% endif %}>7 Months</option>
+                        <option value="8" {% if member.plan == 8 %}selected{% endif %}>8 Months</option>
+                        <option value="9" {% if member.plan == 9 %}selected{% endif %}>9 Months</option>
+                        <option value="10" {% if member.plan == 10 %}selected{% endif %}>10 Months</option>
+                        <option value="11" {% if member.plan == 11 %}selected{% endif %}>11 Months</option>
                         <option value="12" {% if member.plan == 12 %}selected{% endif %}>12 Months</option>
                         <option value="24" {% if member.plan == 24 %}selected{% endif %}>24 Months</option>
                     </select>

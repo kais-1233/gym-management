@@ -5,8 +5,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 import os 
 import csv
+import re
 from flask import Response
-from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
 import psycopg2
 import psycopg2.extras
@@ -51,16 +51,14 @@ def get_days_left(expiry_date):
 
 def send_whatsapp_message(mobile, msg_type, name, gym_name, plan=None, expiry_date=None):
     if msg_type == "welcome":
-        message = f"Hello {name}! 💪 Welcome to {gym_name}. Aapka {plan}-month ka plan activate ho gaya hai."
+        message = f"Hello {name}! 🏋️ Welcome to {gym_name}. Aapka {plan}-month ka plan activate ho gaya hai."
     elif msg_type == "expiring":
         message = f"Hi {name}, reminder! ⏳ Aapka gym subscription {expiry_date} ko expire hone wala hai. Kripya time par renew kar lein."
     elif msg_type == "expired":
-        message = f"Hi {name}, aapka gym plan aaj expire ho chuka hai 🔴. Renew karein!"
+        message = f"Hi {name}, aapka gym plan aaj expire ho chuka hai 🚫. Renew karein!"
     
-    # 1. Terminal print (kabhi chalta hai, kabhi nahi)
-    print(f"\n🚀 [MESSAGE] -> {mobile}", flush=True)
+    print(f"\n📩 [MESSAGE] -> {mobile}", flush=True)
 
-    # 2. FOOLPROOF METHOD: Seedha ek text file me save kar do!
     try:
         log_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'whatsapp_logs.txt')
         with open(log_file, "a", encoding="utf-8") as f:
@@ -77,7 +75,26 @@ def register():
         mobile = request.form["mobile"]
         gym_name = request.form["gym_name"]
         password = request.form["password"]
+        confirm_password = request.form["confirm_password"] # NEW FIELD
         
+        # Check if passwords match
+        if password != confirm_password:
+            flash("Passwords do not match! Please try again.", "danger")
+            return redirect(url_for('register'))
+        #   Mobile 10-digit Validation ---
+        if not re.match(r'^\d{10}$', mobile):
+            flash("Invalid mobile number. Must be exactly 10 digits.", "danger")
+            return redirect(url_for('register'))
+        # Email Validation
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$', email):
+            flash("Invalid email format. Must contain '@' and end with '.com'.", "danger")
+            return redirect(url_for('register'))
+
+        # Password Validation (6-12 chars, at least 1 letter, 1 number, 1 special char)
+        if not re.match(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,12}$', password):
+            flash("Password must be 6 to 12 characters and include a letter, a number, and a special character.", "danger")
+            return redirect(url_for('register'))
+
         hashed_password = generate_password_hash(password)
         
         conn = get_db()
@@ -102,12 +119,11 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        login_id = request.form["login_id"] # Yeh email ya mobile kuch bhi ho sakta hai
+        login_id = request.form["login_id"] 
         password = request.form["password"]
         
         conn = get_db()
         cursor = conn.cursor()
-        # Check if the input matches EITHER email OR mobile
         cursor.execute("SELECT * FROM users WHERE email = %s OR mobile = %s", (login_id, login_id))
         user = cursor.fetchone()
         conn.close()
@@ -135,7 +151,6 @@ def forgot_password():
         conn.close()
         
         if user:
-            # User verify ho gaya, usko reset page par bhejenge
             session['reset_user_id'] = user['id']
             flash("Account verified. Please enter your new password.", "success")
             return redirect(url_for('reset_password'))
@@ -153,6 +168,12 @@ def reset_password():
         
     if request.method == "POST":
         new_password = request.form["new_password"]
+        
+        # Password Validation (6-12 chars, at least 1 letter, 1 number, 1 special char)
+        if not re.match(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,12}$', new_password):
+            flash("Password must be 6 to 12 characters and include a letter, a number, and a special character.", "danger")
+            return redirect(url_for('reset_password'))
+
         hashed_password = generate_password_hash(new_password)
         
         conn = get_db()
@@ -161,7 +182,7 @@ def reset_password():
         conn.commit()
         conn.close()
         
-        session.pop('reset_user_id', None) # Session clean kar diya
+        session.pop('reset_user_id', None)
         flash("Password reset successfully! You can now login.", "success")
         return redirect(url_for('login'))
         
@@ -180,7 +201,6 @@ def dashboard():
     conn = get_db()
     cursor = conn.cursor()
     
-    # PostgreSQL specific syntax for date intervals
     cursor.execute("""
         UPDATE members
         SET member_status='left'
@@ -229,20 +249,22 @@ def add_member():
         mobile = request.form["mobile"]
         plan = int(request.form["plan"])
         join_date = request.form["join_date"]
-
+        # --- NEW: Mobile 10-digit Validation ---
+        if not re.match(r'^\d{10}$', mobile):
+            flash("Invalid mobile number. Must be exactly 10 digits.", "danger")
+            return redirect("/add")
         join_dt = datetime.strptime(join_date, "%Y-%m-%d")
-        expiry_dt = join_dt + relativedelta(months=plan)
+        # 1 Month = 30 Days strictly
+        expiry_dt = join_dt + timedelta(days=plan * 30)
         expiry_date = expiry_dt.strftime("%Y-%m-%d")
 
-        # --- YAHAN CHANGE KIYA HAI: PHOTO OPTIONAL LOGIC ---
-        photo_path = "" # Default blank path agar user photo nahi dalta
+        photo_path = "" 
         if 'photo' in request.files:
             photo = request.files["photo"]
-            if photo and photo.filename != "": # Agar file select ki gayi hai tabhi save ho
+            if photo and photo.filename != "":
                 filename = photo.filename
                 photo_path = os.path.join(UPLOAD_FOLDER, filename)
                 photo.save(photo_path)
-        # --------------------------------------------------
 
         conn = get_db()
         cursor = conn.cursor()
@@ -253,7 +275,7 @@ def add_member():
 
         conn.commit()
         conn.close()
-        # --- YEH NAYI LINE ADD KARNI HAI ---
+        
         send_whatsapp_message(mobile, "welcome", name=name, gym_name=session['gym_name'], plan=plan)
         return redirect("/members")
 
@@ -269,12 +291,10 @@ def members():
     conn = get_db()
     cursor = conn.cursor()
 
-    # FIX LOGIC: Agar search query aayi hai, toh 'active' aur 'left' dono status ke members fetch karenge
     if search:
         page_title = "Search Results"
         cursor.execute("SELECT * FROM members WHERE user_id=%s", (session['user_id'],))
     else:
-        # Purana logic: Agar koi status tab click kiya hai bina search ke
         if status == "active":
             page_title = "Active Members"
         elif status == "expiring":
@@ -292,11 +312,9 @@ def members():
         member_dict = dict(member)
         member_dict["days_left"] = days_left  
          
-        # Text-based Search Filter (Name aur Mobile dono ke liye)
         if search and search.lower() not in member["name"].lower() and search not in member["mobile"]:
             continue
 
-        # Status Filter Only (Jab search use NA ho raha ho)
         if not search:
             if status == "active" and days_left <= 2: continue
             elif status == "expiring" and not (1 <= days_left <= 2): continue
@@ -313,7 +331,6 @@ def edit_member(id):
     conn = get_db()
     cursor = conn.cursor()
     
-    # Ensure users can only edit their OWN members
     cursor.execute("SELECT * FROM members WHERE id=%s AND user_id=%s", (id, session['user_id']))
     member = cursor.fetchone()
 
@@ -326,9 +343,13 @@ def edit_member(id):
         mobile = request.form["mobile"]
         plan = int(request.form["plan"])
         join_date = request.form["join_date"]
-
+        # --- NEW: Mobile 10-digit Validation ---
+        if not re.match(r'^\d{10}$', mobile):
+            flash("Invalid mobile number. Must be exactly 10 digits.", "danger")
+            return redirect("/add")
         join_dt = datetime.strptime(join_date, "%Y-%m-%d")
-        expiry_dt = join_dt + relativedelta(months=plan)
+        # 1 Month = 30 Days strictly
+        expiry_dt = join_dt + timedelta(days=plan * 30)
         expiry_date = expiry_dt.strftime("%Y-%m-%d")
 
         cursor.execute("""
@@ -367,7 +388,6 @@ def recent_joins():
     conn = get_db()
     cursor = conn.cursor()
     
-    # PostgreSQL specific month/year extraction
     cursor.execute("""
         SELECT * FROM members
         WHERE EXTRACT(MONTH FROM join_date) = EXTRACT(MONTH FROM CURRENT_DATE)
@@ -387,31 +407,21 @@ def recent_joins():
 
     return render_template("members.html", members=member_list, page_title="Recent Joined Members")
 
- 
-
- 
-
-# Export Data Route (Working CSV Export - Without Status)
 @app.route("/export")
 @login_required
 def export_excel():
     conn = get_db()
     cursor = conn.cursor()
     
-    # Query se 'member_status' ko hata diya gaya hai
     cursor.execute("SELECT id, name, mobile, plan, join_date, expiry_date FROM members WHERE user_id=%s", (session['user_id'],))
     members = cursor.fetchall()
     conn.close()
 
     def generate():
-        # Excel/CSV Header se 'Status' hata diya hai
         yield "ID,Name,Mobile,Plan (Months),Join Date,Expiry Date\n"
-        
-        # User Data Rows se bhi status wala column hata diya hai
         for m in members:
             yield f"{m['id']},{m['name']},{m['mobile']},{m['plan']},{m['join_date']},{m['expiry_date']}\n"
 
-    # Return CSV file for download
     return Response(
         generate(), 
         mimetype='text/csv', 
@@ -422,7 +432,6 @@ def export_excel():
 def delete_member(id):
     conn = get_db()
     cursor = conn.cursor()
-    # Security: Ensure they can only delete their own member
     cursor.execute("DELETE FROM members WHERE id=%s AND user_id=%s", (id, session['user_id']))
     conn.commit()
     conn.close()

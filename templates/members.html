@@ -58,6 +58,10 @@
         transition: left 0.3s ease-in-out;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
+    }
+    .sidebar::-webkit-scrollbar { 
+        display: none; 
     }
 
     .close-sidebar-btn {
@@ -147,6 +151,7 @@
         <a href="/add"><i class="bi bi-person-plus-fill"></i> Add Member</a>
         <a href="/members" class="active"><i class="bi bi-people-fill"></i> Member List</a>
         <a href="/left-gym"><i class="bi bi-door-closed-fill"></i> Left Member</a>
+        <a href="/recent-joins"><i class="bi bi-clock-history"></i> Recent Joins</a>
         <a href="/export"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</a>
     </div>
     <div>
@@ -174,7 +179,7 @@
                         <th>Photo</th>
                         <th>Name</th>
                         <th>Mobile</th>
-                        <th>Plan</th>
+                        <th>Join Date</th> <th>Plan</th>
                         <th>Expiry Date</th>
                         <th>Status</th>
                         <th class="text-center">Action</th>
@@ -188,7 +193,7 @@
                         </td>
                         <td class="fw-bold">{{ member.name }}</td>
                         <td>{{ member.mobile }}</td>
-                        <td>{{ member.plan }} Mo</td>
+                        <td>{{ member.join_date }}</td> <td>{{ member.plan }} Mo</td>
                         <td>{{ member.expiry_date }}</td>
                         <td>
                             {% if member.days_left <= -30 %}

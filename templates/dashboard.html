@@ -12,12 +12,11 @@
     <style>
     :root {
         --bg-main: #f8fafc;
-        --sidebar-bg: #111827; /* Dark theme */
+        --sidebar-bg: #111827; 
         --accent-color: #6366f1;
         --text-main: #1e293b;
         --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 5px 15px -7px rgba(0, 0, 0, 0.05);
         
-        /* Icon Colors */
         --blue-primary: #4f46e5;
         --green-success: #16a34a;
         --orange-warning: #ea580c;
@@ -33,7 +32,6 @@
         overflow-x: hidden;
     }
 
-    /* --- Top Mobile Header --- */
     .mobile-header {
         display: none;
         background-color: var(--sidebar-bg);
@@ -64,7 +62,6 @@
         margin: 0;
     }
 
-    /* --- Sidebar Navigation --- */
     .sidebar {
         width: 260px;
         height: 100vh;
@@ -116,7 +113,6 @@
         margin: 0;
     }
 
-    /* Sidebar Links UI */
     .sidebar-nav {
         flex-grow: 1;
     }
@@ -155,7 +151,6 @@
         margin-top: auto;
     }
 
-    /* Sidebar Overlay for Mobile */
     .sidebar-overlay {
         position: fixed;
         top: 0;
@@ -169,14 +164,12 @@
         transition: opacity 0.3s ease;
     }
 
-    /* Main Content */
     .main-content {
         margin-left: 260px;
         padding: 30px;
         transition: margin-left 0.3s ease;
     }
 
-    /* --- Premium UI Cards --- */
     .topbar, .search-container {
         background: rgba(255, 255, 255, 0.9);
         border-radius: 16px;
@@ -185,7 +178,6 @@
         padding: 20px;
     }
 
-    /* Stat Cards Styling */
     .stat-card {
         background: white;
         border-radius: 16px;
@@ -221,9 +213,6 @@
     .icon-orange { background: #ffedd5; color: var(--orange-warning); }
     .icon-red { background: #fee2e2; color: var(--red-danger); }
 
-    /* ==========================================
-       MOBILE RESPONSIVE TWEAKS
-       ========================================== */
     @media (max-width: 768px) {
         .mobile-header {
             display: flex; 
@@ -259,7 +248,7 @@
         }
         
         .topbar a {
-            width: 100%; /* Make add member button full width on mobile */
+            width: 100%; 
         }
 
         .search-container {
@@ -304,7 +293,7 @@
         <a href="/add"><i class="bi bi-person-plus-fill"></i> Add Member</a>
         <a href="/members"><i class="bi bi-people-fill"></i> Member List</a>
         <a href="/left-gym"><i class="bi bi-door-closed-fill"></i> Left Member</a>
-        
+        <a href="/recent-joins"><i class="bi bi-clock-history"></i> Recent Joins</a>
         <a href="/export"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</a>
     </div>
 
@@ -420,7 +409,7 @@
 
     openBtn.addEventListener('click', toggleSidebar);
     closeBtn.addEventListener('click', toggleSidebar);
-    overlay.addEventListener('click', toggleSidebar); // Close when clicking outside
+    overlay.addEventListener('click', toggleSidebar);
 </script>
 
 </body>

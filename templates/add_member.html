@@ -59,6 +59,10 @@
         transition: left 0.3s ease-in-out;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
+    }
+    .sidebar::-webkit-scrollbar { 
+        display: none; 
     }
 
     .close-sidebar-btn {
@@ -156,7 +160,19 @@
     </style>
 </head>
 <body>
+<div class="topbar d-flex justify-content-between align-items-center mb-4">
+        </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 <div class="mobile-header">
     <button class="hamburger-btn" id="openSidebarBtn"><i class="bi bi-list"></i></button>
     <h5 class="margin-0" style="text-transform: uppercase;">{{ session.gym_name }}</h5>
@@ -176,6 +192,7 @@
         <a href="/add" class="active"><i class="bi bi-person-plus-fill"></i> Add Member</a>
         <a href="/members"><i class="bi bi-people-fill"></i> Member List</a>
         <a href="/left-gym"><i class="bi bi-door-closed-fill"></i> Left Member</a>
+        <a href="/recent-joins"><i class="bi bi-clock-history"></i> Recent Joins</a>
         <a href="/export"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</a>
     </div>
     <div>
@@ -203,7 +220,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Mobile Number</label>
-                    <input type="text" name="mobile" class="form-control" placeholder="Enter mobile" required>
+                    <input type="text" name="mobile" class="form-control" placeholder="10-digit number" pattern="[0-9]{10}" maxlength="10" title="Please enter exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                 </div>
             </div>
             <div class="row">
@@ -211,9 +228,18 @@
                     <label class="form-label fw-bold">Membership Plan</label>
                     <select name="plan" class="form-select" required>
                         <option value="1">1 Month</option>
+                        <option value="2">2 Months</option>
                         <option value="3">3 Months</option>
+                        <option value="4">4 Months</option>
+                        <option value="5">5 Months</option>
                         <option value="6">6 Months</option>
+                        <option value="7">7 Months</option>
+                        <option value="8">8 Months</option>
+                        <option value="9">9 Months</option>
+                        <option value="10">10 Months</option>
+                        <option value="11">11 Months</option>
                         <option value="12">12 Months</option>
+                        <option value="24">24 Months</option>
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
